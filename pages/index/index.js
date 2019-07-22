@@ -12,7 +12,7 @@ Page({
     marqueeDistance: 0,//初始滚动距离
     marquee_margin: 30,
     size:14,
-    interval: 20 // 时间间隔
+    interval: 10 // 时间间隔
 
     // canIUse: wx.canIUse('button.open-type.getUserInfo')
   },
@@ -29,27 +29,26 @@ Page({
       })
 
     }
-    // 请求公司名称
-    // wx.request({
-    //   url: 'http://underwriting.algerfan.cn/company/select',
-    //   method: 'get',
-    //   header: {
-    //     'content-type': 'application/json' 
-    //   },
-    //   success: res => {
-    //     let companyList=res.data.companyList;
-    //     let companyArray =[];
-    //     if(res.data.status==1){
-    //       for(let i in companyList){
-    //         companyArray.push(companyList[i].company);
-    //       }
-    //       this.setData({
-    //         array: companyList,
-    //         companyArray:companyArray
-    //       })
-    //     }
-    //   }
-    // })
+    // 请求公告
+    wx.request({
+      url: 'https://www.gycxe.com/announcement',
+      method: 'get',
+      header: {
+        'content-type': 'application/json' 
+      },
+      success: res => {
+        console.log(res);
+        
+         if(res.data.status==1){
+          let textList=res.data.list;
+          console.log(textList);
+           let textcon = textList[0].type + ',' + textList[0].content + ',' + textList[0].date;
+          this.setData({
+            text: textcon
+          })
+        }
+      }
+    })
   },
   loginoutClick: function(even) {
     this.setData({
@@ -60,44 +59,44 @@ Page({
     wx.redirectTo({
       url: './../self/self'
     })
-  },
-  onShow: function () {
-    var that = this;
-    var length = that.data.text.length * that.data.size;//文字长度
-    var windowWidth = wx.getSystemInfoSync().windowWidth;// 屏幕宽度
-    //console.log(length,windowWidth);
-    that.setData({
-      length: length,
-      windowWidth: windowWidth
-    });
-    that.scrolltxt();// 第一个字消失后立即从右边出现
-  },
-  scrolltxt: function () {
-    var that = this;
-    var length = that.data.length;//滚动文字的宽度
-    var windowWidth = that.data.windowWidth;//屏幕宽度
-    if (length > windowWidth){
-      var interval = setInterval(function () {
-        var maxscrollwidth = length + that.data.marquee_margin;//滚动的最大宽度，文字宽度+间距，如果需要一行文字滚完后再显示第二行可以修改marquee_margin值等于windowWidth即可
-        var crentleft = that.data.marqueeDistance;
-        if (crentleft < maxscrollwidth) {//判断是否滚动到最大宽度
-          that.setData({
-            marqueeDistance: crentleft + that.data.marqueePace
-          })
-        }
-        else {
-          //console.log("替换");
-          that.setData({
-            marqueeDistance: 0 // 直接重新滚动
-          });
-          clearInterval(interval);
-          that.scrolltxt();
-        }
-      }, that.data.interval);
-    }
-    else{
-      that.setData({ marquee_margin:"1000"});//只显示一条不滚动右边间距加大，防止重复显示
-    } 
   }
+  // onShow: function () {
+  //   var that = this;
+  //   var length = that.data.text.length * that.data.size;//文字长度
+  //   var windowWidth = wx.getSystemInfoSync().windowWidth;// 屏幕宽度
+  //   //console.log(length,windowWidth);
+  //   that.setData({
+  //     length: length,
+  //     windowWidth: windowWidth
+  //   });
+  //   that.scrolltxt();// 第一个字消失后立即从右边出现
+  // },
+  // scrolltxt: function () {
+  //   var that = this;
+  //   var length = that.data.length;//滚动文字的宽度
+  //   var windowWidth = that.data.windowWidth;//屏幕宽度
+  //   if (length > windowWidth){
+  //     var interval = setInterval(function () {
+  //       var maxscrollwidth = length + that.data.marquee_margin;//滚动的最大宽度，文字宽度+间距，如果需要一行文字滚完后再显示第二行可以修改marquee_margin值等于windowWidth即可
+  //       var crentleft = that.data.marqueeDistance;
+  //       if (crentleft < maxscrollwidth) {//判断是否滚动到最大宽度
+  //         that.setData({
+  //           marqueeDistance: crentleft + that.data.marqueePace
+  //         })
+  //       }
+  //       else {
+  //         //console.log("替换");
+  //         that.setData({
+  //           marqueeDistance: 0 // 直接重新滚动
+  //         });
+  //         clearInterval(interval);
+  //         that.scrolltxt();
+  //       }
+  //     }, that.data.interval);
+  //   }
+  //   else{
+  //     that.setData({ marquee_margin:"1000"});//只显示一条不滚动右边间距加大，防止重复显示
+  //   } 
+  // }
 
 })

@@ -61,3 +61,34 @@
   height: 90rpx;
   line-height: 90rpx;
 }
+ 
+ 
+@keyframes remindMessage {
+  0% {
+    -webkit-transform: translateX(0%);
+  }
+ 
+  100% {
+    -webkit-transform: translateX(-450%);
+  }
+}
+ 
+.tongzhitext {
+  line-height: 50rpx;
+  margin-left:10rpx;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  padding: 10rpx 20rpx;
+  background: #f8f8f8;
+}
+ 
+.tongzhi-text {
+  font-size: 28rpx;
+  animation: remindMessage 15s linear infinite;
+  width: 100%;
+  color: #000;
+  display: block;
+  
+}
+ 
