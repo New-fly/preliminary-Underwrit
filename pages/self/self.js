@@ -37,14 +37,17 @@ Page({
               success: function (res) {
 
                 console.log(res)
-                that.setData({
-                  userInfo: res.data.userInfo,
-                  hasUserInfo: true,
-                });
-
-                  wx.switchTab({
-                      url: './../index/index'
+                if(res.data.status !=0){
+                  that.setData({
+                    userInfo: res.data.userInfo,
+                    hasUserInfo: true,
                   });
+  
+                    wx.switchTab({
+                        url: './../index/index'
+                    });
+                }
+                
                 },
           fail: function () {
             console.log('获取用户信息失败')
