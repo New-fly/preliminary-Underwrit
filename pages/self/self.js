@@ -14,10 +14,53 @@ Page({
     companyArray:null,
     login_msg:'',
   },
-
   onLoad: function () {
-    console.log(app.globalData.userInfo)
-    
+    let that = this;
+    wx.checkSession({
+      success:function(res){
+        console.log(res,'登录未过期');
+      
+            wx.request({
+              url: 'https://www.gycxe.com/agent/checkKey',
+              method: 'post',
+              header: {
+                'content-type': 'application/x-www-form-urlencoded',
+              },
+              data: {
+                key: wx.getStorageSync('Session_Key'),
+                encryptedData: wx.getStorageSync('encryptedData'),
+                iv: wx.getStorageSync('iv')
+                
+              },
+             
+              
+              success: function (res) {
+
+                console.log(res)
+                that.setData({
+                  userInfo: res.data.userInfo,
+                  hasUserInfo: true,
+                });
+
+                  wx.switchTab({
+                      url: './../index/index'
+                  });
+                },
+          fail: function () {
+            console.log('获取用户信息失败')
+          }
+        })
+
+       
+      },
+      fail:function(res){
+        console.log(res,'登录过期了')
+        wx.showModal({
+          title: '提示',
+          content: '你的登录信息过期了，请重新登录',
+        })
+      }
+    })
     // 请求公司名称
     wx.request({
       url: 'https://www.gycxe.com/company/select',
@@ -39,23 +82,7 @@ Page({
         }
       }
     })
-    // 进入时判断globaldata.userinfo 是否有用户信息
-    if (app.globalData.userInfo != null) {
-      this.setData({
-        userInfo: app.globalData.userInfo,
-        hasUserInfo: true
-      })
-      wx.switchTab({
-        url: './../index/index'
-      })
-    }
   },
-  // bindKeycompany: function (e) {
-  //   let val = e.detail.value;
-  //   this.setData({
-  //     company: val
-  //   })
-  // },
   bindKeyemployee: function (e) {
     let val = e.detail.value;
     this.setData({
@@ -83,6 +110,8 @@ Page({
             wx.getUserInfo({
               success: function (res) {
                 //3.请求自己的服务器，解密用户信息 获取unionId等加密信
+                wx.setStorageSync('encryptedData',res.encryptedData);
+                wx.setStorageSync('iv',res.iv);
                 wx.request({
                   url: 'https://www.gycxe.com/agent/login',
                   data: {
@@ -100,6 +129,7 @@ Page({
                       console.log(res);
                       if(res.data.status ==1){
                         app.globalData.userInfo = res.data.userInfo;
+                        wx.setStorageSync('Session_Key',res.data.key)
                         that.setData({
                           userInfo: res.data.userInfo,
                           hasUserInfo: true,
