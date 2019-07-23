@@ -27,12 +27,12 @@ Page({
    */
   onShow: function () {
       let that = this;
-      wx.login({
-          success: function (res) {
-              var code = res.code;
-              if (code) {
-                  wx.getUserInfo({
-                      success: function (res) {
+      // wx.login({
+      //     success: function (res) {
+      //         var code = res.code;
+      //         if (code) {
+      //             wx.getUserInfo({
+      //                 success: function (res) {
                           wx.request({
                             url: 'https://www.gycxe.com/underwriting/findUnderwriting',
                               header: {
@@ -40,9 +40,9 @@ Page({
                               },
                               method: 'get',
                               data: {
-                                  'encryptedData': res.encryptedData,
-                                  'iv': res.iv,
-                                  code: code
+                                'encryptedData': wx.getStorageSync('encryptedData'),
+                                'iv': wx.getStorageSync('iv'),
+                                'key': wx.getStorageSync('Session_Key')
                               },
                               success: function (res) {
                                   console.log(res.data.list);
@@ -51,11 +51,11 @@ Page({
                                   })
                               }
                           })
-                      }
-                  })
-              }
-          }
-      })
+      //                 }
+      //             })
+      //         }
+      //     }
+      // })
   },
 
   /**

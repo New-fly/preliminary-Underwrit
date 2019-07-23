@@ -8,7 +8,7 @@ Page({
       Gender: ['男', '女'],
       encryptedData: '',
       iv: '',
-      code: '',
+      Session_Key: '',
       phone: ''
   },
   /*
@@ -55,7 +55,6 @@ Page({
                 content: '请对核保人健康状况进行简单描述',
             })
         }else{
-            console.log(e.detail.value.phone);
             wx.request({
               url: 'https://www.gycxe.com/underwriting/insert',
                 header: {
@@ -71,7 +70,7 @@ Page({
                     'introduce': e.detail.value.introduce,
                     'encryptedData': this.data.encryptedData,
                     'iv': this.data.iv,
-                    'code': this.data.code
+                    'key': this.data.Session_Key
                 },
                 success: function (res) {
                     wx.showModal({
@@ -83,27 +82,14 @@ Page({
                               form_info: '',
                               index: '',
                               date: '',
-                              phone: ''
-                            });
-                            wx.login({
-                              success: function (res) {
-                                console.log(res)
-                                var code = res.code;
-                                if (code) {
-                                  wx.getUserInfo({
-                                    success: function (res) {
-                                      Foo.setData({
-                                        encryptedData: res.encryptedData,
-                                        iv: res.iv,
-                                        code: code
-                                      })
-                                      wx.navigateTo({
-                                        url: "/pages/file/file?encryptedData=" + res.encryptedData + "&iv=" + res.iv + "&code=" + code + "&formId=" + e.detail.formId
-                                      });
-                                    }
-                                  })
-                                }
-                              }
+                              phone: '',
+                              encryptedData: wx.getStorageSync('encryptedData'),
+                              iv: wx.getStorageSync('iv'),
+                              Session_Key: wx.getStorageSync('Session_Key')
+                            })
+                            var Session_Key = wx.getStorageSync('Session_Key')
+                            wx.navigateTo({
+                              url: "/pages/file/file?encryptedData=" + res.encryptedData + "&iv=" + res.iv + "&Session_Key=" + Session_Key + "&formId=" + e.detail.formId
                             })
                           }else{
                             wx.switchTab({
@@ -120,23 +106,11 @@ Page({
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
-      let that=this;
-      wx.login({
-          success: function (res) {
-              var code = res.code;
-              if (code) {
-                  wx.getUserInfo({
-                      success: function (res) {
-                            that.setData({
-                              encryptedData: res.encryptedData,
-                              iv: res.iv,
-                              code: code
-                          })
-                      }
-                  })
-              }
-          }     
-      })
+    this.setData({
+      encryptedData: wx.getStorageSync('encryptedData'),
+      iv: wx.getStorageSync('iv'),
+      Session_Key: wx.getStorageSync('Session_Key')
+    })
   },
   /**
    * 生命周期函数--监听页面初次渲染完成

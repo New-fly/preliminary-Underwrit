@@ -6,14 +6,14 @@ Page({
   data: {
     'encryptedData': '',
     'iv': '',
-    'code': '',
+    'key': '',
     'formId': '',
     'TIP':'选择文件'
   },
   chooseFile:function(){
     var change=this;
-    var encryptedData = this.data.encryptedData;
-    var iv = this.data.iv;
+    var encryptedData = wx.getStorageSync('encryptedData');
+    var iv = wx.getStorageSync('iv');
     var formId = this.data.formId;
     wx.chooseMessageFile({
       count: 10,
@@ -22,45 +22,7 @@ Page({
         change.setData({
           'TIP': '文件上传中'
         });
-        console.log(file.tempFiles);
-        var NUMBER = 0;
-        setInterval(function () {
-          var code;
-          if (NUMBER < file.tempFiles.length) {
-          wx.login({
-            success: function (ress) {
-              code = ress.code;
-                wx.uploadFile({
-                  url: 'https://www.gycxe.com/underwriting/upload',
-                  filePath: file.tempFiles[NUMBER].path,
-                  name: 'file',
-                  formData: {
-                    'encryptedData': encryptedData,
-                    'iv': iv,
-                    'code': code,
-                    'formId': formId
-                  },
-                  success(res) {
-                    NUMBER++;
-                    console.log(res);
-                    if (NUMBER == file.tempFiles.length){
-                      wx.showModal({
-                        title: '提示',
-                        content: '上传成功',
-                        success: function (res) {
-                          wx.switchTab({
-                            url: "/pages/submit/submit"
-                          })
-                        }
-                      })
-                    }
-                  }
-                })
-              
-                }
-            })
-          }
-        }, 2000)
+        uploadFile(file.tempFiles, 0, formId,change);
       }
     })
   },
@@ -70,12 +32,12 @@ Page({
   onLoad: function (options) {
     var encryptedData = options.encryptedData;
     var iv = options.iv;
-    var code = options.code;
+    var key = options.key;
     var formId = options.formId;
     this.setData({
       encryptedData: encryptedData,
       iv: iv,
-      code: code,
+      key: key,
       formId: formId
     })
   },
@@ -129,3 +91,38 @@ Page({
 
   }
 })
+
+function uploadFile(fileTemp, NUMBER, formId,set){
+  console.log(fileTemp.length);
+  console.log(NUMBER);
+  wx.uploadFile({
+    url: 'https://www.gycxe.com/underwriting/upload',
+    filePath: fileTemp[NUMBER].path,
+    name: 'file',
+    formData: {
+      'encryptedData': wx.getStorageSync('encryptedData'),
+      'iv': wx.getStorageSync('iv'),
+      'key': wx.getStorageSync('Session_Key'),
+      'formId': formId
+    },
+    success(res) {
+      set.setData({
+        'TIP': '第' + (NUMBER+1) + '个文件上传成功'
+      });
+      console.log(res);
+      if (NUMBER+1 == fileTemp.length) {
+        wx.showModal({
+          title: '提示',
+          content: '上传成功',
+          success: function (res) {
+            wx.switchTab({
+              url: "/pages/submit/submit"
+            })
+          }
+        })
+      } else {
+        uploadFile(fileTemp, NUMBER+1, formId,set);
+      }
+    }
+  })
+}
