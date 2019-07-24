@@ -16,7 +16,7 @@
     </view>
     <!-- 出生年月 -->
     <view class="section">
-    <picker mode="date" value="{{date}}" name="birthday" start="1900-01-01" end="2019-12-30" bindchange="bindDateChange">
+    <picker mode="date" value="{{date}}" name="birthday" start="1900-01-01" end="2100-01-01" bindchange="bindDateChange">
         <view class="picker">
         <view>出生年月</view>
         <view class='paddingRight'>{{date}}</view>

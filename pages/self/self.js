@@ -19,7 +19,6 @@ Page({
     wx.checkSession({
       success:function(res){
         console.log(res,'登录未过期');
-      
             wx.request({
               url: 'https://www.gycxe.com/agent/checkKey',
               method: 'post',
@@ -42,12 +41,10 @@ Page({
                     userInfo: res.data.userInfo,
                     hasUserInfo: true,
                   });
-  
                     wx.switchTab({
                         url: './../index/index'
                     });
                 }
-                
                 },
           fail: function () {
             console.log('获取用户信息失败')
