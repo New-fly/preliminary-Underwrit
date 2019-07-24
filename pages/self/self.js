@@ -38,6 +38,7 @@ Page({
 
                 console.log(res)
                 if(res.data.status !=0){
+                  app.globalData.userInfo = res.data.userInfo;
                   that.setData({
                     userInfo: res.data.userInfo,
                     hasUserInfo: true,
