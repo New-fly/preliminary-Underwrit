@@ -5,6 +5,7 @@ Page({
    * 页面的初始数据
    */
   data: {
+    date:"1980-01-01",
       Gender: ['男', '女'],
       encryptedData: '',
       iv: '',
@@ -55,51 +56,72 @@ Page({
                 content: '请对核保人健康状况进行简单描述',
             })
         }else{
-            wx.request({
-              url: 'https://www.gycxe.com/underwriting/insert',
-                header: {
-                    'content-type': 'application/x-www-form-urlencoded'
-                },
-                method: 'POST',
-                data: {
-                    'formId': e.detail.formId,
-                    'name': e.detail.value.name,
-                    'sex': e.detail.value.sex == 0 ? 'male' : 'female',
-                    'birthday': e.detail.value.birthday,
-                    'phone': e.detail.value.phone,
-                    'introduce': e.detail.value.introduce,
-                    'encryptedData': this.data.encryptedData,
-                    'iv': this.data.iv,
-                    'key': this.data.Session_Key
-                },
-                success: function (res) {
-                    wx.showModal({
-                        title: '提示',
-                        content: '是否上传附件',
-                        success: function (res) {
-                          if (res.confirm) {
-                            Foo.setData({
-                              form_info: '',
-                              index: '',
-                              date: '',
-                              phone: '',
-                              encryptedData: wx.getStorageSync('encryptedData'),
-                              iv: wx.getStorageSync('iv'),
-                              Session_Key: wx.getStorageSync('Session_Key')
-                            })
-                            var Session_Key = wx.getStorageSync('Session_Key')
-                            wx.navigateTo({
-                              url: "/pages/file/file?encryptedData=" + res.encryptedData + "&iv=" + res.iv + "&Session_Key=" + Session_Key + "&formId=" + e.detail.formId
-                            })
-                          }else{
-                            wx.switchTab({
-                              url: "/pages/submit/submit"
-                            })
+          wx.checkSession({
+            success: function (res) {
+              wx.request({
+                url: 'https://www.gycxe.com/underwriting/insert',
+                  header: {
+                      'content-type': 'application/x-www-form-urlencoded'
+                  },
+                  method: 'POST',
+                  data: {
+                      'formId': e.detail.formId,
+                      'name': e.detail.value.name,
+                      'sex': e.detail.value.sex == 0 ? 'male' : 'female',
+                      'birthday': e.detail.value.birthday,
+                      'phone': e.detail.value.phone,
+                      'introduce': e.detail.value.introduce,
+                      'encryptedData': Foo.data.encryptedData,
+                      'iv': Foo.data.iv,
+                      'key': Foo.data.Session_Key
+                  },
+                  success: function (res) {
+                    console.log('res');
+                    console.log(res);
+                      if (res.data.status == 0) {
+                        wx.switchTab({
+                          url: './../self/self'
+                        });
+                      }
+                      wx.showModal({
+                          title: '提示',
+                          content: '是否上传附件',
+                          success: function (res) {
+                            if (res.confirm) {
+                              Foo.setData({
+                                form_info: '',
+                                index: '',
+                                date: '',
+                                phone: '',
+                                encryptedData: wx.getStorageSync('encryptedData'),
+                                iv: wx.getStorageSync('iv'),
+                                Session_Key: wx.getStorageSync('Session_Key')
+                              })
+                              var Session_Key = wx.getStorageSync('Session_Key')
+                              wx.navigateTo({
+                                url: "/pages/file/file?encryptedData=" + res.encryptedData + "&iv=" + res.iv + "&Session_Key=" + Session_Key + "&formId=" + e.detail.formId
+                              })
+                            }else{
+                              wx.switchTab({
+                                url: "/pages/submit/submit"
+                              })
+                            }
                           }
-                        }
-                    })
-                }
-            })
+                      })
+                  }
+              })
+            },
+            fail: function (res) {
+              console.log(res, '登录过期了')
+              wx.showModal({
+                title: '提示',
+                content: '你的登录信息过期了，请重新登录',
+              })
+              wx.navigateTo({
+                url: "/pages/self/self"
+              })
+            }
+          })
         }
     }, 
   /**

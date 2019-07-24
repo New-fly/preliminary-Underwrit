@@ -93,36 +93,53 @@ Page({
 })
 
 function uploadFile(fileTemp, NUMBER, formId,set){
-  console.log(fileTemp.length);
-  console.log(NUMBER);
-  wx.uploadFile({
-    url: 'https://www.gycxe.com/underwriting/upload',
-    filePath: fileTemp[NUMBER].path,
-    name: 'file',
-    formData: {
-      'encryptedData': wx.getStorageSync('encryptedData'),
-      'iv': wx.getStorageSync('iv'),
-      'key': wx.getStorageSync('Session_Key'),
-      'formId': formId
-    },
-    success(res) {
-      set.setData({
-        'TIP': '第' + (NUMBER+1) + '个文件上传成功'
-      });
-      console.log(res);
-      if (NUMBER+1 == fileTemp.length) {
-        wx.showModal({
-          title: '提示',
-          content: '上传成功',
-          success: function (res) {
+  wx.checkSession({
+    success: function (res) {
+      wx.uploadFile({
+        url: 'https://www.gycxe.com/underwriting/upload',
+        filePath: fileTemp[NUMBER].path,
+        name: 'file',
+        formData: {
+          'encryptedData': wx.getStorageSync('encryptedData'),
+          'iv': wx.getStorageSync('iv'),
+          'key': wx.getStorageSync('Session_Key'),
+          'formId': formId
+        },
+        success(res) {
+          if (res.data.status == 0) {
             wx.switchTab({
-              url: "/pages/submit/submit"
-            })
+              url: './../self/self'
+            });
           }
-        })
-      } else {
-        uploadFile(fileTemp, NUMBER+1, formId,set);
-      }
+          set.setData({
+            'TIP': '第' + (NUMBER+1) + '个文件上传成功'
+          });
+          console.log(res);
+          if (NUMBER+1 == fileTemp.length) {
+            wx.showModal({
+              title: '提示',
+              content: '上传成功',
+              success: function (res) {
+                wx.switchTab({
+                  url: "/pages/submit/submit"
+                })
+              }
+            })
+          } else {
+            uploadFile(fileTemp, NUMBER+1, formId,set);
+          }
+        }
+      })
+    },
+    fail: function (res) {
+      console.log(res, '登录过期了')
+      wx.showModal({
+        title: '提示',
+        content: '你的登录信息过期了，请重新登录',
+      })
+      wx.navigateTo({
+        url: "/pages/self/self"
+      })
     }
   })
 }
