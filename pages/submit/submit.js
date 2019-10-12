@@ -33,7 +33,7 @@ Page({
     */
     formSubmit: function (e) {
         var Foo = this;
-        var name = /^[\u4E00-\u9FA5]{2,4}$/;
+        var name = /^[\u4E00-\u9FA5]{2,10}$/;
         var phoneNum = /^1([38]\d|5[0-35-9]|7[3678])\d{8}$/;
         if (e.detail.name == '' || !name.test(e.detail.value.name)){
             wx.showModal({
